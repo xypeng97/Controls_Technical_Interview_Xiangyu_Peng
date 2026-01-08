@@ -40,6 +40,7 @@ Candidate Action Items:
   there's a bug in the code.
 - Briefly describe your implementation (1-3 sentences).
   - ADD YOUR ANSWER HERE
+  - As stop takes 3 seconds and moving to the next floor only takes 1 second, my strategy is to stop as less as possible. Therefore, if the elevator is not empty, do the majority vote, or go to the nearest destination floor. If the elevator is empty, go to the nearest floor where there are people waiting.
 
 Don't forget; we are interested in both your solution and your thought process.
 

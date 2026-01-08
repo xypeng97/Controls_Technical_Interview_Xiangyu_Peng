@@ -40,8 +40,10 @@ Candidate Action Items:
 - Answer the following questions:
   - What would you tell the junior engineer about ways that they could improve their code in the future? (1-3 sentences)
     - ADD YOUR ANSWER HERE
+    - They should add comments in the code to make reading easier for others. Pay attention to syntax errors and build small testable helpers to debug the code.
   - How else would you change this code to make it better so you can build on it in the future?(1-10 sentences).
     - ADD YOUR ANSWER HERE
+    - setVerticalTrafficLight and setHorizontalTrafficLight could be combined so that the code is more concise. "R","G","Y" could also be replaced by traffic_light_color_enum to be more consistent throughout the code. The strategy could also be improved: I think prioritizing allowing 2 cars to go would always be better than allowing 1 car in terms of minimizing cumulative waiting time, so the algo should not just compare the total number of cars of north+south and east+west, but also examining if there are cars waiting from both north and south OR east and west.
 
 Don't forget; we are interested in both your solution and your thought process.
 

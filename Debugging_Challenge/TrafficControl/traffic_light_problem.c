@@ -115,6 +115,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 	char * newColor = currentColor;
 	traffic_light_colors_t currentColorEnum = -1;
 
+	// Add: should be parallel else if here.
 	if(strcmp(currentColor,"R") == 0)
 	{
 		currentColorEnum = RED;
@@ -122,40 +123,53 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 	else if(strcmp(currentColor,"G") == 0)
 	{
 		currentColorEnum = GREEN;
-
-		if(strcmp(currentColor,"Y") == 0)
-		{
-			currentColorEnum = YELLOW;
-		}
+	}
+	else if(strcmp(currentColor,"Y") == 0)
+	{
+		currentColorEnum = YELLOW;
 	}
 
+	// printf("NorthCars Waiting Time: %i\n", intersection.northboundCars.timeWaiting);
+	// printf("SouthCars Waiting Time: %i\n", intersection.southboundCars.timeWaiting);
+	// printf("EastCars Waiting Time: %i\n", intersection.eastboundCars.timeWaiting);
+	// printf("WestCars Waiting Time: %i\n", intersection.westboundCars.timeWaiting);
+
 	t++;
+
+	// Add: add break for Switch-Case.
 	switch(currentColorEnum)
 	{
+		// When Horizontal light is RED, and more cars are waiting on the Horizontal line, and Vertical light is RED.
 		case RED:
 			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
 				t = 0;
 			}
+			break;
 
+		// When Horizontal light is GREEN, and fewer cars are waiting on the Horizontal line, or it has been green for over 10 seconds.
 		case GREEN:
 			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
 			{
 				newColor = "Y";
 				t = 0;
 			}
+			break;
 
+		// If Horizontal line has been YELLOW for 1 second.
 		case YELLOW:
 			if(t > 1)
 			{
 				newColor = "R";
 				t = 0;
 			}
+			break;
 
 		default:
 			newColor = "R";
 			t = 0;	
+			break;
 	}
 
 	return newColor;
@@ -168,14 +182,14 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 	char * newColor = currentColor;
 	traffic_light_colors_t currentColorEnum = -1;
 
+	// Add: Same as Horizontal function.
 	if(strcmp(currentColor,"R") == 0)
 	{
 		currentColorEnum = RED;
-
-		if(strcmp(currentColor,"G") == 0)
-		{	
-			currentColorEnum = GREEN;
-		}
+	}
+	else if(strcmp(currentColor,"G") == 0)
+	{	
+		currentColorEnum = GREEN;
 	}
 	else if(strcmp(currentColor,"Y") == 0)
 	{
@@ -424,8 +438,9 @@ static void delay(int16_t ms)
 
 static int8_t checkForCrashes(void)
 {
+	// Add: Vertical should be north + south.
 	int8_t isHorizantalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
-	int8_t isVerticalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
+	int8_t isVerticalCarInIntersection = (myIntersection.northboundCars.carsInIntersection | myIntersection.southboundCars.carsInIntersection);
 
 	if(isHorizantalCarInIntersection && isVerticalCarInIntersection){return 1;}
 	return 0;

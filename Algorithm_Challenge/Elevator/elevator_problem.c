@@ -46,7 +46,79 @@ static void delay(int16_t ms);
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	return 0;
+	// The elevator starts on a random floor.
+	// Check the number of people on the elevator, and identify the first index of people in the elevator.
+	int8_t numPeople = 0;
+	int8_t idx = -1;
+	for(int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++) {
+		if(building.elevator.passengers[i] > -1) {
+			numPeople++;
+			if(idx < 0) {
+				idx = i;
+			}
+		}
+	}
+
+	// printf("NumPeople: %hhd\n", numPeople);
+	// printf("idx: %hhd\n", idx);
+
+	int8_t nearestFloor = -1;
+	int8_t bestDistance = BUILDING_HEIGHT;
+
+	// If there are people in the elevator.
+	if(numPeople > 0) {
+
+		// The elevator goes to the floor by majority vote.
+		for(int8_t i = idx; i < ELEVATOR_MAX_CAPACITY; i++) {
+			int8_t destination = building.elevator.passengers[i];
+			int8_t count = 1;
+
+			for(int8_t j = i+1; j < ELEVATOR_MAX_CAPACITY; j++) {
+				if(building.elevator.passengers[j] == destination) {
+					count++;
+				}
+			}
+			
+			if(count > numPeople / 2) {
+				// building.elevator.nextStop = destination; 
+				// printf("destination: %hhd\n", destination);
+				return destination;
+			}
+		}
+
+		// The elevator goes to the nearest desired floor.
+		nearestFloor = building.elevator.passengers[idx];
+		bestDistance = abs(nearestFloor - building.elevator.currentFloor);
+
+		for(int8_t i = idx; i < ELEVATOR_MAX_CAPACITY; i++) {
+			if(building.elevator.passengers[i] != -1) {	// No need to compare when passengers[i] == -1.
+				int8_t destination = building.elevator.passengers[i];
+				int8_t distance = abs(destination - building.elevator.currentFloor);
+			
+				if(distance < bestDistance) {
+					bestDistance = distance;
+					nearestFloor = destination;
+				}
+			}
+		}
+	}
+
+
+	// If there is no one in the elevator, go to the nearest floor where people are waiting.
+	else {
+		for(int8_t i = 0; i < BUILDING_HEIGHT; i++) {
+			if(building.floors[i].departures[0] != -1 || building.floors[i].departures[1] != -1) {
+				int8_t distance = abs(i - building.elevator.currentFloor);
+				if(distance < bestDistance) {
+					bestDistance = distance;
+					nearestFloor = i;
+				}
+			}
+		}
+	}
+
+	// printf("NEAREST: %hhd\n", nearestFloor);
+	return nearestFloor;
 }
 
 
